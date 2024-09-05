@@ -1,3 +1,26 @@
 spring:
   application:
     name: community-onion
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/community-onion
+    username: shlee
+    password: 4617
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+jwt:
+  security:
+    key: Y29tbXVuaXR5LW9uaW9uIEtleSB0byB1c2Ugd2hlbiBnZW5lcmF0aW5nIHRva2Vu
+    expiration: 1800000
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
