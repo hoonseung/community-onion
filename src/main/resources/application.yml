@@ -17,3 +17,10 @@ spring:
         format_sql: true
 
 
+jwt:
+  security:
+    key: Y29tbXVuaXR5LW9uaW9uIEtleSB0byB1c2Ugd2hlbiBnZW5lcmF0aW5nIHRva2Vu
+    expiration: 1800000
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace

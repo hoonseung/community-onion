@@ -1,10 +1,14 @@
 package com.onion.backend.service;
 
 import com.onion.backend.dto.user.User;
+import com.onion.backend.dto.user.UserLoginRequest;
 import com.onion.backend.dto.user.UserSignUpRequest;
-import com.onion.backend.entity.UserEntity;
-import com.onion.backend.entity.repository.UserRepository;
+import com.onion.backend.entity.user.UserEntity;
+import com.onion.backend.entity.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    //private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
 
     // 회원가입
@@ -25,7 +29,7 @@ public class UserService {
         }
 
         UserEntity userPs = userRepository.save(
-            UserEntity.of(request.username(), request.password(),
+            UserEntity.of(request.username(), passwordEncoder.encode(request.password()),
                 request.email()));
 
         return User.from(userPs);
@@ -33,13 +37,45 @@ public class UserService {
 
 
     @Transactional
-    public User secession(Long id) {
+    public Long secession(Long id) {
         UserEntity user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         userRepository.delete(user);
 
-        return User.from(user);
+        return id;
+    }
+
+
+    @Transactional
+    public User login(UserLoginRequest request) {
+        UserEntity userPs = getUser(request.username());
+        if (!passwordEncoder.matches(request.password(), userPs.getPassword())) {
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
+        User user = User.from(userPs);
+        userPs.refreshLastLogin();
+
+        return user;
+    }
+
+
+    public List<User> getUsers() {
+        return userRepository.findAll()
+            .stream()
+            .map(User::from)
+            .toList();
+    }
+
+
+    public User loadUserByUsername(String username) {
+        return User.from(getUser(username));
+    }
+
+
+    private UserEntity getUser(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
     }
 
 

@@ -1,6 +1,6 @@
-package com.onion.backend.entity.repository;
+package com.onion.backend.entity.user.repository;
 
-import com.onion.backend.entity.UserEntity;
+import com.onion.backend.entity.user.UserEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
