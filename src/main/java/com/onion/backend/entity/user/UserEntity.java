@@ -53,4 +53,9 @@ public class UserEntity extends BaseEntity {
     }
 
 
+    public void checkUsername(String username) {
+        if (!this.username.equals(username)){
+            throw new IllegalArgumentException("유저 이름이 일치하지 않습니다.");
+        }
+    }
 }

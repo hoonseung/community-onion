@@ -2,6 +2,7 @@ package com.onion.backend.controller;
 
 import com.onion.backend.dto.article.ArticleResponse;
 import com.onion.backend.dto.article.CreateArticleRequest;
+import com.onion.backend.dto.article.UpdateArticleRequest;
 import com.onion.backend.dto.common.dto.Response;
 import com.onion.backend.service.board.article.ArticleService;
 import java.util.List;
@@ -9,9 +10,11 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,7 +50,7 @@ public class ArticleController {
         @PathVariable Long boardId,
         @RequestParam(required = false) Long lastId,
         @RequestParam(required = false) Long firstId) {
-        if (Objects.isNull(lastId) && Objects.isNull(firstId)){
+        if (Objects.isNull(lastId) && Objects.isNull(firstId)) {
             return ResponseEntity.ok(
                 Response.success(
                     articleService.getArticles(boardId)
@@ -62,5 +65,24 @@ public class ArticleController {
             )
         );
     }
+
+
+    @PutMapping("/board/{boardId}/article/{articleId}")
+    public ResponseEntity<Response<Long>> editArticle(@PathVariable Long boardId,
+        @PathVariable Long articleId, @RequestBody UpdateArticleRequest request,
+        Authentication authentication) {
+        return ResponseEntity.ok(Response.success(
+            articleService.editArticle(articleId, boardId, request, authentication.getName())
+        ));
+    }
+
+
+    @DeleteMapping("/board/{boardId}/article/{articleId}")
+    public ResponseEntity<Response<Void>> deleteArticle(@PathVariable Long boardId,
+        @PathVariable Long articleId, Authentication authentication) {
+        articleService.deleteArticle(articleId, boardId, authentication.getName());
+        return ResponseEntity.ok(Response.success(null));
+    }
+
 
 }

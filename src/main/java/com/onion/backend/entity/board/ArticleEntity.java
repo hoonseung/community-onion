@@ -19,10 +19,15 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.springframework.util.StringUtils;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE \"article\" SET is_deleted = 1 WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 @Table(name = "\"article\"")
 @Entity
 public class ArticleEntity extends BaseEntity {
@@ -46,12 +51,19 @@ public class ArticleEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private BoardEntity board;
 
+    @Column(nullable = false)
+    private boolean isDeleted;
+
 
     public static ArticleEntity of(String title, String text, UserEntity author,
         BoardEntity board) {
         return new ArticleEntity(null,
-            title, ArticleContent.of(text), author, board);
+            title, ArticleContent.of(text), author, board, false);
     }
 
 
+    public void edit(String title, String text) {
+        this.title = StringUtils.hasText(title) ? title : this.title;
+        this.content = StringUtils.hasText(text) ? ArticleContent.of(text) : this.content;
+    }
 }
