@@ -1,6 +1,7 @@
-package com.onion.backend.dto.common;
+package com.onion.backend.dto.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.onion.backend.dto.common.exception.ErrorType;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Response<T>(
@@ -14,8 +15,8 @@ public record Response<T>(
         return new Response<>(1, "success", data);
     }
 
-    public static <T> Response<T> fail() {
-        return new Response<>(0, "fail", null);
+    public static <T> Response<T> fail(ErrorType type) {
+        return new Response<>(type.getCode(), type.getDescription(), null);
     }
 
 }

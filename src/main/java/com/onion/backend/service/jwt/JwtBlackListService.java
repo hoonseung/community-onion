@@ -1,4 +1,4 @@
-package com.onion.backend.service;
+package com.onion.backend.service.jwt;
 
 import com.onion.backend.entity.jwt.JwtBlackListEntity;
 import com.onion.backend.entity.jwt.LogoutType;
