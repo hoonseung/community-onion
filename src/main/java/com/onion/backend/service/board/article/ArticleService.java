@@ -1,6 +1,6 @@
 package com.onion.backend.service.board.article;
 
-import com.onion.backend.dto.article.ArticleResponse;
+import com.onion.backend.dto.article.Article;
 import com.onion.backend.dto.article.CreateArticleRequest;
 import com.onion.backend.dto.article.UpdateArticleRequest;
 import com.onion.backend.dto.common.exception.TimeRateLimitException;
@@ -57,50 +57,56 @@ public class ArticleService {
     }
 
 
-    public ArticleResponse getArticle(Long articleId, Long boardId) {
+    public Article getArticle(Long articleId, Long boardId) {
+        return Article.from(getArticleEntity(articleId, boardId));
+    }
+
+    public ArticleEntity getArticleEntity(Long articleId, Long boardId) {
         return articleEntityRepository.findByIdAndBoardId(articleId, boardId)
-            .map(ArticleResponse::from)
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
     }
 
 
-    public List<ArticleResponse> getArticles(Long boardId) {
+    public List<Article> getArticles(Long boardId) {
         return articleEntityRepository.findAllByBoardIdLOrderByCreatedDateDesc(boardId).stream()
-            .map(ArticleResponse::from)
+            .map(Article::from)
             .toList();
     }
 
-    public List<ArticleResponse> getOldArticles(Long boardId, Long articleId) {
+    public List<Article> getOldArticles(Long boardId, Long articleId) {
         return articleEntityRepository.findAllByBoardIdAndArticleIdLessThanLOrderByCreatedDateDesc(
                 boardId, articleId)
             .stream()
-            .map(ArticleResponse::from)
+            .map(Article::from)
             .toList();
     }
 
-    public List<ArticleResponse> getLatestArticles(Long boardId, Long articleId) {
+    public List<Article> getLatestArticles(Long boardId, Long articleId) {
         return articleEntityRepository.findAllByBoardIdAndArticleIdGreaterThanLOrderByCreatedDateDesc(
                 boardId, articleId)
             .stream()
-            .map(ArticleResponse::from)
+            .map(Article::from)
             .toList();
     }
 
 
     private boolean canNotWriteArticle(String username) {
-        ArticleEntity articlePs = articleEntityRepository.findLatestCreateArticleByUsername(
-                username)
-            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
+        if (articleEntityRepository.existsByAuthorUsername(username)) {
+            ArticleEntity articlePs = articleEntityRepository.findLatestCreateArticleByUsername(
+                    username)
+                .orElseThrow(() -> new EntityNotFoundException("최신 게시글을 찾을 수 없습니다."));
 
-        Duration duration = Duration.between(articlePs.getCreatedAt(), LocalDateTime.now());
+            Duration duration = Duration.between(articlePs.getCreatedAt(), LocalDateTime.now());
 
-        return duration.toMinutes() < 5;
+            return duration.toMinutes() < 5;
+        }
+        return false;
     }
 
     private boolean canNotUpdateArticle(String username) {
         ArticleEntity articlePs = articleEntityRepository.findLatestUpdateArticleByUsername(
                 username)
-            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("최신 게시글을 찾을 수 없습니다."));
 
         Duration duration = Duration.between(articlePs.getUpdatedAt(), LocalDateTime.now());
 

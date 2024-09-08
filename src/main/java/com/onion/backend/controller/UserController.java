@@ -1,6 +1,6 @@
 package com.onion.backend.controller;
 
-import com.onion.backend.dto.common.Response;
+import com.onion.backend.dto.common.dto.Response;
 import com.onion.backend.dto.user.User;
 import com.onion.backend.dto.user.UserLoginRequest;
 import com.onion.backend.dto.user.UserLoginResponse;
@@ -8,8 +8,8 @@ import com.onion.backend.dto.user.UserSignUpRequest;
 import com.onion.backend.dto.user.UserSignUpResponse;
 import com.onion.backend.entity.jwt.LogoutType;
 import com.onion.backend.security.jwt.JwtProvider;
-import com.onion.backend.service.JwtBlackListService;
-import com.onion.backend.service.UserService;
+import com.onion.backend.service.jwt.JwtBlackListService;
+import com.onion.backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -25,5 +25,7 @@ public interface ArticleEntityRepository extends JpaRepository<ArticleEntity, Lo
 
     Optional<ArticleEntity> findByIdAndBoardId(Long id, Long boardId);
 
+    boolean existsByAuthorUsername(String username);
+
 
 }

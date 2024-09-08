@@ -1,6 +1,6 @@
 package com.onion.backend.controller;
 
-import com.onion.backend.dto.article.ArticleResponse;
+import com.onion.backend.dto.article.SearchArticleResponse;
 import com.onion.backend.dto.article.CreateArticleRequest;
 import com.onion.backend.dto.article.UpdateArticleRequest;
 import com.onion.backend.dto.common.dto.Response;
@@ -37,33 +37,35 @@ public class ArticleController {
 
 
     @GetMapping("/board/{boardId}/article/{articleId}")
-    public ResponseEntity<Response<ArticleResponse>> getArticle(@PathVariable Long boardId,
+    public ResponseEntity<Response<SearchArticleResponse>> getArticle(@PathVariable Long boardId,
         @PathVariable Long articleId) {
         return ResponseEntity.ok(
-            Response.success(articleService.getArticle(articleId, boardId))
+            Response.success(articleService.getArticle(articleId, boardId).toSearchArticleResponse()
+            )
         );
     }
 
 
     @GetMapping("/board/{boardId}/articles")
-    public ResponseEntity<Response<List<ArticleResponse>>> getLatestArticles(
+    public ResponseEntity<Response<List<SearchArticleResponse>>> getLatestArticles(
         @PathVariable Long boardId,
         @RequestParam(required = false) Long lastId,
         @RequestParam(required = false) Long firstId) {
         if (Objects.isNull(lastId) && Objects.isNull(firstId)) {
             return ResponseEntity.ok(
                 Response.success(
-                    articleService.getArticles(boardId)
-                )
-            );
+                    articleService.getArticles(boardId).stream().map(SearchArticleResponse::from)
+                        .toList()
+            ));
         }
 
         return ResponseEntity.ok(
             Response.success(
-                Objects.nonNull(lastId) ? articleService.getOldArticles(boardId, lastId) :
-                    articleService.getLatestArticles(boardId, firstId)
-            )
-        );
+                Objects.nonNull(lastId) ? articleService.getOldArticles(boardId, lastId).stream().map(SearchArticleResponse::from)
+                        .toList() :
+                    articleService.getLatestArticles(boardId, firstId).stream().map(SearchArticleResponse::from)
+                        .toList()
+        ));
     }
 
 
