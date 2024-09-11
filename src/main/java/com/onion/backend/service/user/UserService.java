@@ -1,10 +1,10 @@
-package com.onion.backend.service;
+package com.onion.backend.service.user;
 
 import com.onion.backend.dto.user.User;
 import com.onion.backend.dto.user.UserLoginRequest;
 import com.onion.backend.dto.user.UserSignUpRequest;
 import com.onion.backend.entity.user.UserEntity;
-import com.onion.backend.entity.user.repository.UserRepository;
+import com.onion.backend.entity.user.repository.UserEntityRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserEntityRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -39,7 +39,7 @@ public class UserService {
     @Transactional
     public Long secession(Long id) {
         UserEntity user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
 
         userRepository.delete(user);
 
@@ -73,7 +73,7 @@ public class UserService {
     }
 
 
-    private UserEntity getUser(String username) {
+    public UserEntity getUser(String username) {
         return userRepository.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다."));
     }
