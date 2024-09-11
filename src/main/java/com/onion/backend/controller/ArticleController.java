@@ -1,7 +1,7 @@
 package com.onion.backend.controller;
 
-import com.onion.backend.dto.article.SearchArticleResponse;
 import com.onion.backend.dto.article.CreateArticleRequest;
+import com.onion.backend.dto.article.SearchArticleResponse;
 import com.onion.backend.dto.article.UpdateArticleRequest;
 import com.onion.backend.dto.common.dto.Response;
 import com.onion.backend.service.board.article.ArticleService;
@@ -36,16 +36,6 @@ public class ArticleController {
     }
 
 
-    @GetMapping("/board/{boardId}/article/{articleId}")
-    public ResponseEntity<Response<SearchArticleResponse>> getArticle(@PathVariable Long boardId,
-        @PathVariable Long articleId) {
-        return ResponseEntity.ok(
-            Response.success(articleService.getArticle(articleId, boardId).toSearchArticleResponse()
-            )
-        );
-    }
-
-
     @GetMapping("/board/{boardId}/articles")
     public ResponseEntity<Response<List<SearchArticleResponse>>> getLatestArticles(
         @PathVariable Long boardId,
@@ -56,16 +46,18 @@ public class ArticleController {
                 Response.success(
                     articleService.getArticles(boardId).stream().map(SearchArticleResponse::from)
                         .toList()
-            ));
+                ));
         }
 
         return ResponseEntity.ok(
             Response.success(
-                Objects.nonNull(lastId) ? articleService.getOldArticles(boardId, lastId).stream().map(SearchArticleResponse::from)
-                        .toList() :
-                    articleService.getLatestArticles(boardId, firstId).stream().map(SearchArticleResponse::from)
+                Objects.nonNull(lastId) ? articleService.getOldArticles(boardId, lastId).stream()
+                    .map(SearchArticleResponse::from)
+                    .toList() :
+                    articleService.getLatestArticles(boardId, firstId).stream()
+                        .map(SearchArticleResponse::from)
                         .toList()
-        ));
+            ));
     }
 
 

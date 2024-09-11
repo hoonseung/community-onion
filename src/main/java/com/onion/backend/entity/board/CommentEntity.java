@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE \"comment\" SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE comment SET is_deleted = 1, updated_at = now() WHERE id = ?")
 @SQLRestriction("is_deleted = false")
 @Table(name = "\"comment\"")
 @Entity

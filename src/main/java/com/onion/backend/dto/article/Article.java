@@ -1,9 +1,11 @@
 package com.onion.backend.dto.article;
 
 import com.onion.backend.dto.board.Board;
+import com.onion.backend.dto.comment.Comment;
 import com.onion.backend.dto.user.User;
 import com.onion.backend.entity.board.ArticleEntity;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record Article(
     Long id,
@@ -30,13 +32,13 @@ public record Article(
 
     public SearchArticleResponse toSearchArticleResponse() {
         return new SearchArticleResponse(
-            this.id(),
-            this.board().id(),
-            this.author().id(),
-            this.title(),
-            this.content(),
-            this.createdAt(),
-            this.updatedAt()
+            this.id,
+            this.board.id(),
+            this.author.id(),
+            this.title,
+            this.content,
+            this.createdAt,
+            this.updatedAt
         );
     }
 

@@ -12,9 +12,13 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,9 +30,10 @@ import org.springframework.util.StringUtils;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE \"article\" SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE article SET is_deleted = 1, updated_at = now() WHERE id = ?")
 @SQLRestriction("is_deleted = false")
-@Table(name = "\"article\"")
+@Table(name = "\"article\"", indexes = {
+    @Index(name = "idx_article_board_id", columnList = "id, board_id")})
 @Entity
 public class ArticleEntity extends BaseEntity {
 
@@ -51,6 +56,9 @@ public class ArticleEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private BoardEntity board;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "article")
+    private List<CommentEntity> comments;
+
     @Column(nullable = false)
     private boolean isDeleted;
 
@@ -58,7 +66,7 @@ public class ArticleEntity extends BaseEntity {
     public static ArticleEntity of(String title, String text, UserEntity author,
         BoardEntity board) {
         return new ArticleEntity(null,
-            title, ArticleContent.of(text), author, board, false);
+            title, ArticleContent.of(text), author, board, new ArrayList<>(), false);
     }
 
 

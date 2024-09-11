@@ -12,7 +12,10 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,13 +60,18 @@ public class ArticleService {
     }
 
 
-    public Article getArticle(Long articleId, Long boardId) {
-        return Article.from(getArticleEntity(articleId, boardId));
+    @Async
+    public CompletableFuture<Article> getAsyncWithArticle(Long articleId, Long boardId) {
+        ArticleEntity articlePs = getArticleEntity(boardId, articleId);
+
+        return CompletableFuture.completedFuture(Article.from(articlePs));
     }
 
-    public ArticleEntity getArticleEntity(Long articleId, Long boardId) {
+
+    public ArticleEntity getArticleEntity(Long boardId, Long articleId) {
         return articleEntityRepository.findByIdAndBoardId(articleId, boardId)
-            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+            .orElseThrow(() -> new EntityNotFoundException(
+                String.format("%d 번 게시판에 존재하지 않는 게시글입니다.", boardId)));
     }
 
 
@@ -91,13 +99,11 @@ public class ArticleService {
 
 
     private boolean canNotWriteArticle(String username) {
-        if (articleEntityRepository.existsByAuthorUsername(username)) {
-            ArticleEntity articlePs = articleEntityRepository.findLatestCreateArticleByUsername(
-                    username)
-                .orElseThrow(() -> new EntityNotFoundException("최신 게시글을 찾을 수 없습니다."));
-
-            Duration duration = Duration.between(articlePs.getCreatedAt(), LocalDateTime.now());
-
+        Optional<ArticleEntity> articlePs = articleEntityRepository
+            .findLatestCreateArticleByUsername(username);
+        if (articlePs.isPresent()) {
+            Duration duration = Duration.between(articlePs.get().getCreatedAt(),
+                LocalDateTime.now());
             return duration.toMinutes() < 5;
         }
         return false;
@@ -113,9 +119,20 @@ public class ArticleService {
         return duration.toMinutes() < 5;
     }
 
+    private boolean canNotDeleteArticle(String username) {
+        Optional<ArticleEntity> articlePs = articleEntityRepository.findLatestDeleteArticleByUsername(
+            username);
+        if (articlePs.isPresent()) {
+            Duration duration = Duration.between(articlePs.get().getUpdatedAt(),
+                LocalDateTime.now());
+            return duration.toMinutes() < 5;
+        }
+        return false;
+    }
+
     @Transactional
     public void deleteArticle(Long articleId, Long boardId, String username) {
-        if (canNotUpdateArticle(username)) {
+        if (canNotDeleteArticle(username)) {
             throw new TimeRateLimitException("5분 이내에 삭제한 게시글이 있습니다.");
         }
         articleEntityRepository.findByIdAndBoardId(articleId, boardId)

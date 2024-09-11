@@ -1,6 +1,5 @@
 package com.onion.backend.dto.article;
 
-import com.onion.backend.entity.board.ArticleEntity;
 import java.time.LocalDateTime;
 
 public record SearchArticleResponse(
@@ -13,7 +12,7 @@ public record SearchArticleResponse(
     LocalDateTime updatedAt
 ) {
 
-    public static SearchArticleResponse from(Article article){
+    public static SearchArticleResponse from(Article article) {
         return new SearchArticleResponse(
             article.id(),
             article.board().id(),
