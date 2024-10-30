@@ -42,7 +42,6 @@ public class CommentEntity extends BaseEntity {
     private Long id;
 
     @Embedded
-    @Column(nullable = false, columnDefinition = "TEXT")
     private CommentContent content;
 
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

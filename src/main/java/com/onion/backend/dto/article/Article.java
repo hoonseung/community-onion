@@ -14,7 +14,8 @@ public record Article(
     String title,
     String content,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    Long viewCount
 ) {
 
     public static Article from(ArticleEntity entity) {
@@ -25,7 +26,8 @@ public record Article(
             entity.getTitle(),
             entity.getContent().getText(),
             entity.getCreatedAt(),
-            entity.getUpdatedAt()
+            entity.getUpdatedAt(),
+            entity.getViewCount()
         );
     }
 

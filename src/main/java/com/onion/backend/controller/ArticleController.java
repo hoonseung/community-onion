@@ -4,6 +4,7 @@ import com.onion.backend.dto.article.CreateArticleRequest;
 import com.onion.backend.dto.article.SearchArticleResponse;
 import com.onion.backend.dto.article.UpdateArticleRequest;
 import com.onion.backend.dto.common.dto.Response;
+import com.onion.backend.dto.elasticeSearch.ElasticSearchRequestQuery;
 import com.onion.backend.service.board.article.ArticleService;
 import java.util.List;
 import java.util.Objects;
@@ -61,6 +62,21 @@ public class ArticleController {
     }
 
 
+    @GetMapping("/board/{boardId}/articles/search")
+    public ResponseEntity<Response<List<SearchArticleResponse>>> getSearchArticles(
+        @PathVariable Long boardId,
+        @RequestParam String keyWord) {
+        return ResponseEntity.ok(
+            Response.success(
+                articleService.getArticlesByElasticSearchQueryKeyword
+                        (
+                            ElasticSearchRequestQuery.of(boardId, keyWord)
+                        ).stream().map(SearchArticleResponse::from)
+                    .toList()
+            ));
+    }
+
+
     @PutMapping("/board/{boardId}/article/{articleId}")
     public ResponseEntity<Response<Long>> editArticle(@PathVariable Long boardId,
         @PathVariable Long articleId, @RequestBody UpdateArticleRequest request,
@@ -77,6 +93,5 @@ public class ArticleController {
         articleService.deleteArticle(articleId, boardId, authentication.getName());
         return ResponseEntity.ok(Response.success(null));
     }
-
-
 }
+

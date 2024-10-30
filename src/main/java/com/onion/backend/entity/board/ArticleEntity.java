@@ -45,7 +45,6 @@ public class ArticleEntity extends BaseEntity {
     private String title;
 
     @Embedded
-    @Column(nullable = false, columnDefinition = "TEXT")
     private ArticleContent content;
 
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -62,16 +61,23 @@ public class ArticleEntity extends BaseEntity {
     @Column(nullable = false)
     private boolean isDeleted;
 
+    @Column(nullable = false, columnDefinition = "BIGINT default 0")
+    private Long viewCount;
+
 
     public static ArticleEntity of(String title, String text, UserEntity author,
         BoardEntity board) {
         return new ArticleEntity(null,
-            title, ArticleContent.of(text), author, board, new ArrayList<>(), false);
+            title, ArticleContent.of(text), author, board, new ArrayList<>(), false, 0L);
     }
 
 
     public void edit(String title, String text) {
         this.title = StringUtils.hasText(title) ? title : this.title;
         this.content = StringUtils.hasText(text) ? ArticleContent.of(text) : this.content;
+    }
+
+    public void increaseViewCount() {
+        this.viewCount++;
     }
 }

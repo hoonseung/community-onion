@@ -1,8 +1,8 @@
 package com.onion.backend.security.filter;
 
 import com.onion.backend.security.jwt.JwtProvider;
-import com.onion.backend.service.JwtBlackListService;
-import com.onion.backend.service.UserService;
+import com.onion.backend.service.jwt.JwtBlackListService;
+import com.onion.backend.service.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -37,7 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
-        log.info("before token: {}", token);
 
         if (StringUtils.hasText(token) && !jwtBlackListService.isBlackListToken(token)
             && jwtProvider.isValidToken(token)) {

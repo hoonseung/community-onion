@@ -1,5 +1,6 @@
 package com.onion.backend.entity.board.common;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(staticName = "of")
 public class ArticleContent {
 
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String text;
 
 

@@ -14,7 +14,8 @@ public record SearchArticleWithCommentsResponse(
     String content,
     List<SearchCommentResponse> comments,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    Long viewCount
 ) {
 
 
@@ -30,7 +31,8 @@ public record SearchArticleWithCommentsResponse(
             comments.stream().filter(comment -> Objects.isNull(comment.parentCommentId()))
                 .map(SearchCommentResponse::from).toList(),
             article.createdAt(),
-            article.updatedAt()
+            article.updatedAt(),
+            article.viewCount()
         );
     }
 }

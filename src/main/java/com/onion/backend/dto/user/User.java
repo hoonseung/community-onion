@@ -1,5 +1,6 @@
 package com.onion.backend.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.onion.backend.entity.user.UserEntity;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -7,7 +8,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"password"})
 public record User(
     Long id,
     String username,
